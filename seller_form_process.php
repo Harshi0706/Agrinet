@@ -1,0 +1,32 @@
+<?php
+session_start();
+require 'db_connection.php';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Get form data
+    $full_name = mysqli_real_escape_string($conn, $_POST['full_name']);
+    $business_name = mysqli_real_escape_string($conn, $_POST['business_name']);
+    $business_location = mysqli_real_escape_string($conn, $_POST['business_location']);
+    $products = mysqli_real_escape_string($conn, $_POST['products_sold']);
+    
+    $user_id = $_SESSION['user_id'];
+
+    // Ensure the session variable 'user_id' is set
+    if (isset($user_id)) {
+        // Insert farmer details into 'farmers' table
+        $query = "INSERT INTO sellers (user_id, full_name, business_name, business_location, products_sold) 
+                  VALUES ($user_id, '$full_name', '$business_name', '$business_location','$products')";
+        
+        if (mysqli_query($conn, $query)) {
+            // Complete the sign-up process and redirect to login page
+            header('Location:login.php');
+            exit();  // Ensure script stops executing after redirection
+        } else {
+            // Error handling
+            echo "Error: " . mysqli_error($conn);
+        }
+    } else {
+        echo "Error: User ID is not set. Please start the process from the beginning.";
+    }
+}
+?>
